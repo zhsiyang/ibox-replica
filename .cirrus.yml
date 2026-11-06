@@ -1,0 +1,18 @@
+# Cirrus CI —— 自有 macOS 机队，绕开 GitHub 托管 runner 的账号限制，开源免费。
+#
+# 启用：浏览器打开 https://cirrus-ci.com ，用 GitHub 登录 → "Repositories" 里
+# 找到 zhsiyang/ibox-replica → Enable。之后任意 push / 首次授权都会自动触发本次构建。
+# 产物 iBoxReplica.ipa 在任务页 "Artifacts" 下载（未签名，Sideloadly/AltStore/TrollStore 自签）。
+
+task:
+  name: Build unsigned IPA
+  only_if: $CIRRUS_BRANCH == 'main'
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-sonoma-xcode:15.2
+  build_script:
+    - sudo xcode-select -s /opt/homebrew/opt/llvm 2>/dev/null || true
+    - xcodebuild -version
+    - ./build-ipa.sh
+  artifacts:
+    path: ios/build/iBoxReplica.ipa
+    type: application/zip
