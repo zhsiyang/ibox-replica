@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "trace": "9d286adb",
+  "version": "1.0.1",
+  "trace": "ae784976",
   "files": {
     "assets/icon.png": {
       "sha256": "efa1612c4b2624caa133ee49c58c2e390611b1348d6b9232e7ddb7fa6afb420f",
@@ -15,16 +15,20 @@
       "bytes": 23156
     },
     "index.html": {
-      "sha256": "954ba7c8e72a6caf6ba84276b843499528a0ce934abe9f373ad50df45214c790",
+      "sha256": "241f8a7e270766726f527183db40ad044100be4de465841d2a335ef25430f3fd",
       "bytes": 2590
     },
     "js/api.js": {
-      "sha256": "d2318e9f2d9fd25e4386404b338e641b73bb39df8c31300932cdd94fca627d95",
-      "bytes": 2344
+      "sha256": "95df224487b6b3ecfff9b31804a9cd4197ec216d347106fe32d0ec03edc3fa89",
+      "bytes": 4414
     },
     "js/app.js": {
       "sha256": "3ce52496fc6deecc7f745d5f352706388c49c70ac84932b483bf30908f6d7ba4",
       "bytes": 2613
+    },
+    "js/offline-data.js": {
+      "sha256": "7bc3a6298e5b5dc85b7400f7a9bbbaaf4384793d3b21db016925f8a89c3cdad6",
+      "bytes": 70141
     },
     "js/pages/books.js": {
       "sha256": "e01ae783c173bdd6b91a4ba9f79db704d0f69afdbfc52234672fdf3a3f1926ba",
@@ -71,8 +75,8 @@
       "bytes": 547
     },
     "sw.js": {
-      "sha256": "467c0d287a290b415cbedc39aedf6d965c1003abcd9259fd4705deb51ae5d207",
-      "bytes": 2123
+      "sha256": "483faade0e2e01a6b6f538565b3c7bf012394fd4debeaf8f640363452c4e3638",
+      "bytes": 2175
     }
   }
 }
