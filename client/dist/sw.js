@@ -1,5 +1,5 @@
 /* iBox v1 Service Worker。
-   1.0.0 / 9d286adb / [
+   1.0.1 / ae784976 / [
   "./",
   "./assets/icon.png",
   "./assets/splash.png",
@@ -7,6 +7,7 @@
   "./index.html",
   "./js/api.js",
   "./js/app.js",
+  "./js/offline-data.js",
   "./js/pages/books.js",
   "./js/pages/detail.js",
   "./js/pages/discover.js",
@@ -21,7 +22,7 @@
 ] 由 tools/build_client.js 注入真实值。
    策略：/api/ 与 /health 永远走网络（no-store，避免拿到过期接口状态）；
         静态资源 cache-first + 后台更新（stale-while-revalidate）。 */
-const CACHE = 'ibox-v1-1.0.0-9d286adb';
+const CACHE = 'ibox-v1-1.0.1-ae784976';
 const PRECACHE = [
   "./",
   "./assets/icon.png",
@@ -30,6 +31,7 @@ const PRECACHE = [
   "./index.html",
   "./js/api.js",
   "./js/app.js",
+  "./js/offline-data.js",
   "./js/pages/books.js",
   "./js/pages/detail.js",
   "./js/pages/discover.js",
