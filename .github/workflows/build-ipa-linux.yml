@@ -1,0 +1,64 @@
+name: Build iOS IPA (Linux cross-compile)
+
+# 不依赖 macOS runner：ubuntu 上用 clang -target arm64-apple-ios + ld64.lld 交叉编译，
+# 再用 theos/sdks 的 iPhoneOS SDK 链接 UIKit/WebKit，产出未签名 ipa。
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ios-linux/**'
+      - 'client/dist/**'
+      - '.github/workflows/build-ipa-linux.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld zip imagemagick ldid || true
+          echo "--- toolchain ---"
+          clang --version | head -1
+          which ld64.lld || ls -l /usr/bin/*lld* || true
+          ld64.lld --version || true
+          which ldid || echo "ldid 未装（不影响出包，Sideloadly 重签会补）"
+          which convert || which magick || echo "无 ImageMagick，图标直拷"
+
+      - name: Build unsigned IPA
+        run: |
+          chmod +x ios-linux/build-ipa-linux.sh
+          ./ios-linux/build-ipa-linux.sh
+
+      - name: Verify IPA
+        run: |
+          set -e
+          IPA=ios-linux/build/iBoxReplica.ipa
+          ls -l "$IPA"
+          unzip -l "$IPA" | head -30
+          unzip -l "$IPA" | grep -q "Payload/iBoxReplica.app/iBoxReplica"
+          unzip -l "$IPA" | grep -q "Payload/iBoxReplica.app/dist/index.html"
+          unzip -l "$IPA" | grep -q "Payload/iBoxReplica.app/Info.plist"
+          echo "IPA 结构校验通过"
+
+      - name: Upload IPA
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iBoxReplica-unsigned-ipa
+          path: ios-linux/build/iBoxReplica.ipa
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload build tree on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-debug
+          path: ios-linux/build/
+          if-no-files-found: ignore
+          retention-days: 7
