@@ -18,7 +18,7 @@ ROOT="$(cd "$HERE/.." && pwd)"
 
 APP_NAME="iBoxReplica"
 BUNDLE_ID="com.ibox.replica"
-MIN_IOS="12.0"
+MIN_IOS="15.0"
 SDK_VER="${SDK_VER:-16.5}"
 SKIP_ICON="${SKIP_ICON:-0}"
 
@@ -69,12 +69,17 @@ rm -rf "$OUT/Payload" "$OUT/$APP_NAME.ipa"
 mkdir -p "$APP"
 
 echo "▶ 编译（arm64 / iOS $MIN_IOS）"
+# 交叉编译到 darwin 时 clang 不会自动给 ld64.lld 补 -arch / -platform_version，
+# 这两个必须手工写死在链接参数里，否则 lld 直接报 "must specify -platform_version"。
 clang \
     -target "arm64-apple-ios${MIN_IOS}" \
     -isysroot "$SDK" \
     -F "$SDK/System/Library/Frameworks" \
     -fobjc-arc -fblocks -O2 \
     -fuse-ld="$LD64" \
+    -Wl,-arch,arm64 \
+    -Wl,-platform_version,ios,"${MIN_IOS}","${SDK_VER}" \
+    -Wl,-syslibroot,"$SDK" \
     -Wl,-dead_strip \
     -framework UIKit \
     -framework Foundation \
