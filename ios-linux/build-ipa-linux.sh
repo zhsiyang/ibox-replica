@@ -31,18 +31,22 @@ echo "▶ 环境检查"
 for bin in clang zip; do
     command -v "$bin" >/dev/null || { echo "✗ 缺 $bin"; exit 1; }
 done
-# Mach-O 链接要 ld64.lld（GNU ld 不认 Mach-O）
-if ! command -v ld64.lld >/dev/null 2>&1; then
-    for c in ld64.lld ld.lld lld; do
-        if command -v "$c" >/dev/null 2>&1; then
-            mkdir -p "$OUT/bin"
-            ln -sf "$(command -v "$c")" "$OUT/bin/ld64.lld"
-            export PATH="$OUT/bin:$PATH"
-            break
-        fi
+
+# Mach-O 链接要 ld64.lld（GNU ld 不认 Mach-O）。
+# Ubuntu 的 lld 只装带版本后缀的 ld64.lld-16/17/18，没有无后缀软链，必须显式找。
+find_ld64() {
+    for c in ld64.lld ld64.lld-20 ld64.lld-19 ld64.lld-18 ld64.lld-17 ld64.lld-16; do
+        p="$(command -v "$c" 2>/dev/null || true)"
+        [ -n "$p" ] && { echo "$p"; return 0; }
     done
-fi
-command -v ld64.lld >/dev/null || { echo "✗ 缺 ld64.lld（apt install lld）"; exit 1; }
+    for p in /usr/bin/ld64.lld* /usr/local/bin/ld64.lld*; do
+        [ -x "$p" ] && { echo "$p"; return 0; }
+    done
+    return 1
+}
+LD64="$(find_ld64 || true)"
+[ -n "$LD64" ] || { echo "✗ 缺 ld64.lld（apt install lld）"; exit 1; }
+echo "   ld64: $LD64"
 clang --version | head -1
 
 echo "▶ 准备 iPhoneOS SDK $SDK_VER"
@@ -70,7 +74,7 @@ clang \
     -isysroot "$SDK" \
     -F "$SDK/System/Library/Frameworks" \
     -fobjc-arc -fblocks -O2 \
-    -fuse-ld=lld \
+    -fuse-ld="$LD64" \
     -Wl,-dead_strip \
     -framework UIKit \
     -framework Foundation \
