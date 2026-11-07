@@ -21,12 +21,13 @@ jobs:
       - name: Install toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang lld zip imagemagick ldid || true
+          # ldid 不在 Ubuntu 源里，单独放最后并容忍失败（不影响出包，Sideloadly 重签会补）
+          sudo apt-get install -y clang lld zip imagemagick
+          sudo apt-get install -y ldid || echo "ldid 源里没有，跳过"
           echo "--- toolchain ---"
           clang --version | head -1
-          which ld64.lld || ls -l /usr/bin/*lld* || true
-          ld64.lld --version || true
-          which ldid || echo "ldid 未装（不影响出包，Sideloadly 重签会补）"
+          ls -l /usr/bin/ld64.lld* 2>/dev/null || true
+          which ldid || echo "ldid 未装"
           which convert || which magick || echo "无 ImageMagick，图标直拷"
 
       - name: Build unsigned IPA
